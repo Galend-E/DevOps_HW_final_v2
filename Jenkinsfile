@@ -13,16 +13,25 @@ pipeline {
         sh 'terraform init'
         sh 'terraform plan -out instances.tfplan'
         sh 'terraform apply -auto-approve'
+        sh 'sleep 180'
       }
     }
     stage ('Build and push boxfuse image') {
       steps {
-        sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu --private-key ~/.ssh/ansible.pem -i hosts build.yml'
+        ansiblePlaybook (credentialsId: 'b966c5be-f66e-4ae4-a58e-9fe403d4ef92',
+                         disableHostKeyChecking: true,
+                         installation: 'ansible_2.9.13',
+                         inventory: 'hosts',
+                         playbook: 'build.yml')
       }
     }
     stage ('Pull and run boxfuse image') {
       steps {
-        sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu --private-key ~/.ssh/ansible.pem -i hosts web.yml'
+        ansiblePlaybook (credentialsId: 'b966c5be-f66e-4ae4-a58e-9fe403d4ef92',
+                         disableHostKeyChecking: true,
+                         installation: 'ansible_2.9.13',
+                         inventory: 'hosts',
+                         playbook: 'web.yml')
       }
     }
   }
