@@ -1,0 +1,49 @@
+---
+- name: Build java project
+  hosts: build
+  become: yes
+
+  tasks:
+    - name: Ensure packages is presented
+      apt:
+        name: [default-jdk, maven, docker.io, python3-pip]
+        state: present
+        update_cache: yes
+
+    - name: Ensure docker is presented
+      pip:
+        name: docker
+        state: present
+        executable: pip3
+
+    - name: Ensure git project is cloned
+      git:
+        repo: https://github.com/boxfuse/boxfuse-sample-java-war-hello
+        dest: /tmp/boxfuse
+
+    - name: Build project
+      shell: mvn package
+      args:
+        chdir: /tmp/boxfuse
+
+    - name: Ensure Dockerfile is presented
+      blockinfile:
+        path: /tmp/boxfuse/target/Dockerfile
+        create: yes
+        block: |
+          FROM tomcat:8.0-alpine
+          COPY ./*.war /usr/local/tomcat/webapps
+
+    - name: Log into a docker registry
+      docker_login:
+        username: galend
+        password: docker_password
+
+    - name: Build and push docker image
+      docker_image:
+        build:
+          path: /tmp/boxfuse/target
+        name: galend/devops_trainings:bx-{{ ansible_date_time.date }}
+        push: yes
+        source: build
+        state: present

@@ -1,0 +1,30 @@
+---
+- name: Deploy project
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Ensure packages is presented
+      apt:
+        name: [docker.io, python3-pip]
+        state: present
+        update_cache: yes
+
+    - name: Ensure docker is presented
+      pip:
+        name: docker
+        state: present
+        executable: pip3
+
+    - name: Pull docker image
+      docker_image:
+        name: galend/devops_trainings:bx-{{ ansible_date_time.date }}
+        source: pull
+
+    - name: run docker container
+      docker_container:
+        name: boxfuse-prod
+        state: started
+        image: galend/devops_trainings:bx-{{ ansible_date_time.date }}
+        ports:
+          - "8080:8080"
