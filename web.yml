@@ -1,7 +1,5 @@
 ---
 - name: Deploy project
-  hosts: web
-  become: yes
 
   tasks:
     - name: Ensure packages is presented
