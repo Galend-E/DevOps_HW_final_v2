@@ -1,5 +1,6 @@
 ---
 - name: Build java project
+  hosts: build
 
   tasks:
     - name: Ensure packages is presented
