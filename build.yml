@@ -6,7 +6,11 @@
   tasks:
     - name: Ensure packages is presented
       apt:
-        name: [default-jdk, maven, docker.io, python3-pip]
+        pkg:
+          - default-jdk
+          - maven
+          - docker.io
+          - python3-pip
         state: present
         update_cache: yes
 

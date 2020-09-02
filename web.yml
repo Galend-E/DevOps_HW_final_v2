@@ -6,7 +6,9 @@
   tasks:
     - name: Ensure packages is presented
       apt:
-        name: [docker.io, python3-pip]
+        pkg:
+          - docker.io
+          - python3-pip
         state: present
         update_cache: yes
 
